@@ -7,43 +7,46 @@ package org.standard.wll;
 
 public class Calculations extends Inputs {
 
-	// actualizes the factor number
-	public void fix_data(double[] result, int []parameter_dil ) {
-		for (int i = 0; i < result.length; i++) {
-			if (result[i] != 0) {
-				factor = (id_dilution / parameter_dil[i]);
-				break;
-			}
+	// actualizes the factor num. Finds the starting position of the new fixed array
+	// of raw data. Uses said position to find which dilution it corresponds to
+	public void fix_data(double[] result, int[] parameter_dil, double id_dil) {
+		int i = 0;
+		while (result[i] == 0 && i < (result.length - 1)) {
+			i++;
 		}
+		if (result[i] != 0) {
+			factor = (id_dil / parameter_dil[i]);
+		}
+
 	}
 
 	// removes the sample values that would not result in a negative slope.
-	public double[] fix_negative_slope(double[] data, int [] parameter_dil, double diff_2_factor) {
+	public double[] fix_negative_slope(double[] data, int[] parameter_dil, double diff_2_factor, double id_dil) {
 		double p1 = 0;
 		double p2 = 0;
 		double diff = 0;
-		double thirty_percent = 0; // this depends on the df
+		double percent_cutoff = 0; // this depends on the df
 		double[] result = new double[data.length];
 
 		for (int i = 0; i < (data.length - 1); i++) {
 			p1 = data[i];
 			p2 = data[i + 1];
-			thirty_percent = (p1 * diff_2_factor);
+			percent_cutoff = (p1 * diff_2_factor);
 			diff = (p1 - p2);
-			if (diff >= thirty_percent) {
+			if (diff >= percent_cutoff) {
 				result[i] = data[i]; // CHECK IF THERE IS AT LEAST 2 NUMBERS IN IT
 			} else
 				result[i] = 0;
 		}
 		p1 = result[data.length - 2];
 		p2 = data[data.length - 1];
-		thirty_percent = (p1 * diff_2_factor);
+		percent_cutoff = (p1 * diff_2_factor);
 		diff = (p1 - p2);
-		if (diff >= thirty_percent) {
+		if (diff >= percent_cutoff) {
 			result[(data.length - 1)] = data[(data.length - 1)];
 		}
 
-		fix_data(result, parameter_dil);
+		fix_data(result, parameter_dil, id_dil);
 		return result;
 	}
 

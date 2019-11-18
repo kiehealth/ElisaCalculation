@@ -142,13 +142,13 @@ public class Outputs {
 		cell.setCellValue(1);
 		cell.setCellStyle(style);
 
-		// errors
+		// errors, if any of the error is true then you have an error type 1
 		if (error) {
 			cell = row.createCell(header.length - 2);
-			cell.setCellValue(2);
+			cell.setCellValue(1);
 			cell.setCellStyle(warning_style);
 			cell = row.createCell(header.length - 1);
-			cell.setCellValue("Could be re-tested");
+			cell.setCellValue("Poor Standard");
 			error = false;
 		}
 
@@ -237,7 +237,7 @@ public class Outputs {
 		// errors
 		if (data_calculations.length == error_check || ((data_calculations.length - error_check) == 1)) {
 			cell = row.createCell(raw_size + 7);
-			cell.setCellValue(1);
+			cell.setCellValue(2);
 			cell.setCellStyle(warning_style);
 			cell = row.createCell(raw_size + 8);
 			cell.setCellValue("Must be re-tested");
@@ -247,14 +247,14 @@ public class Outputs {
 
 		} else if (error) {
 			cell = row.createCell(raw_size + 7);
-			cell.setCellValue(2);
+			cell.setCellValue(3);
 			cell.setCellStyle(warning_style);
 			cell = row.createCell(raw_size + 8);
 			cell.setCellValue("Could be re-tested");
 			error = false;
 		} else if ((data_calculations.length - error_check) == 2) {
 			cell = row.createCell(raw_size + 7);
-			cell.setCellValue(3);
+			cell.setCellValue(4);
 			cell.setCellStyle(warning_style);
 			cell = row.createCell(raw_size + 8);
 			cell.setCellValue("Two dilutions used");
@@ -338,9 +338,10 @@ public class Outputs {
 	}
 
 	// writes the output to a file
-	public void output_file(XSSFWorkbook workbook, XSSFWorkbook input) throws IOException {
+	public void output_file(XSSFWorkbook workbook, XSSFWorkbook input, String output_name, String output_path)
+			throws IOException {
 		input.close();
-		FileOutputStream file_out = new FileOutputStream("Serology.xlsx");
+		FileOutputStream file_out = new FileOutputStream( output_path + output_name + ".xlsx");
 		workbook.write(file_out);
 		file_out.close();
 		workbook.close();

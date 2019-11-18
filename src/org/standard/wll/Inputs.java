@@ -8,6 +8,8 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -84,10 +86,10 @@ public class Inputs {
 
 	// This method is used to load the excel files that would be used as inputs for
 	// the program. File_name is provided by the user.
-	public XSSFWorkbook load_excel(String file_name) throws IOException, FileNotFoundException, InvalidFormatException {
+	public Workbook load_excel(String file_name) throws IOException, FileNotFoundException, InvalidFormatException {
 
-		XSSFWorkbook workbook = new XSSFWorkbook(new File(file_name));
-
+//		XSSFWorkbook workbook = new XSSFWorkbook(new File(file_name));
+		Workbook workbook = WorkbookFactory.create(new File(file_name));
 		return workbook;
 	}
 
@@ -338,8 +340,8 @@ public class Inputs {
 				Cell dilution_check = row.getCell(3);
 				id_dilution = dilution_check.getNumericCellValue();
 				if (id_dilution != dilution[0]) {
-					factor = (id_dilution / dilution[0]);
-				}
+					factor = (id_dilution / dilution[0]); //first dilution of the id over the starting dil of raw data.
+				}										  //preliminary, need to manipulate later in the Calc class
 				for (int i = 0; i < ctrl.length; i++) {
 					Row t_row = ctrl_sheet.getRow(rowindex + i);
 					Cell type_cell = t_row.getCell(type_col);

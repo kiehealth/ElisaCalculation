@@ -34,7 +34,6 @@ public class Main {
 		// in.close();
 
 		// help the user out to fill all the sections
-		//if (args.length < 1 || args[0] == null || args[1] == null) {
 		if (args.length < 3) {
 			System.out.println(
 					" \n Please re-run your program like this: \n "

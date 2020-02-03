@@ -1,5 +1,7 @@
 package org.standard.wll;
 
+import java.util.ArrayList;
+
 /**
  * @author Victoria Torres
  *
@@ -38,12 +40,14 @@ public class Calculations extends Inputs {
 			} else
 				result[i] = 0;
 		}
-		p1 = result[data.length - 2];
-		p2 = data[data.length - 1];
-		percent_cutoff = (p1 * diff_2_factor);
-		diff = (p1 - p2);
-		if (diff >= percent_cutoff) {
-			result[(data.length - 1)] = data[(data.length - 1)];
+		if (data.length - 2 >= 0) {
+			p1 = result[data.length - 2];
+			p2 = data[data.length - 1];
+			percent_cutoff = (p1 * diff_2_factor);
+			diff = (p1 - p2);
+			if (diff >= percent_cutoff) {
+				result[(data.length - 1)] = data[(data.length - 1)];
+			}
 		}
 
 		fix_data(result, parameter_dil, id_dil);
@@ -87,6 +91,19 @@ public class Calculations extends Inputs {
 		}
 		return log;
 	}
+	
+	public double[] log_resultsCTRL(ArrayList<Double> ctrl) {
+		double[] log = new double[ctrl.size()];
+
+		for (int i = 0; i < log.length; i++) {
+			if (ctrl.get(i) > 0) {
+				log[i] = Math.log(ctrl.get(i));
+			} else
+				log[i] = -1; // alerts the calculations
+		}
+		return log;
+	}
+	
 
 	public double Ymean(double[] array) {
 		int denominator = 0;

@@ -2,8 +2,7 @@ package org.standard.wll;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.ArrayList;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -18,25 +17,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, InvalidFormatException {
-		// Used to get the users input
-		// Scanner in = new Scanner(System.in);
-		// in.useLocale(Locale.US);
 
+		// Used to get the users input
 		Inputs ip = new Inputs();
 		Outputs op = new Outputs();
 		Calculations cp = new Calculations();
 
-		// path to the Excel file with master sheet, control & standard, reference
-	    // factors, cut-off values
-		// System.out.print("Path to the Excel file (should end in FileName.xlsx): ");
-		// String input_path = in.nextLine();
-		
-		// in.close();
-
 		// help the user out to fill all the sections
 		if (args.length < 3) {
-			System.out.println(
-					" \n Please re-run your program like this: \n "
+			System.out.println(" \n Please re-run your program like this: \n "
 					+ "java program.jar /path/to/input name_of_output /path/to/output");
 			System.exit(-1);
 		}
@@ -78,12 +67,12 @@ public class Main {
 				double cut_off_value = ip.cut_off(cutoff_sheet, hpv[master_counter]);
 
 				// This is all the processing required for a raw data sheet
-				int size = ip.size_dilutionlst(raw_sheet);
+				int size = ip.size_dilutionlst(raw_sheet, ip.get_dilutions().length, 0);
 				double[] data = new double[size];
 				double[] data_calculations = new double[size];
 
 				double[] dilution = ip.get_dilutions(raw_sheet, size); // gets the dilution list
-				double[] ctrl; // will be done in the while loop
+				ArrayList<Double> ctrl; // will be done in the while loop
 
 				int[] parameter_dilutions = ip.get_dilutions();
 
@@ -119,27 +108,36 @@ public class Main {
 				// get a new value from ctrls & standards
 				String run_check = "0";
 				boolean first_line = false;
+				String id_check = " ";
 
 				int pos = 0;
-				int ending = (raw_sheet.getLastRowNum() - size);
 
 				System.out.println("processing");
-
-				while (pos <= ending) { // counter for each line
+		//		int lastrow = raw_sheet.getPhysicalNumberOfRows(); 
+				while (pos < raw_sheet.getLastRowNum()) { 
+					
 					String[] run_id = ip.run_id(raw_sheet, pos);
-					if (!run_id[0].equals(run_check)) {
+					if (!run_id[0].equals(run_check)) {  //Checks if we are looking at different run, to get new ctrl
 						first_line = true;
-						size = ip.size_dilutionlst(raw_sheet);
+						size = ip.size_dilutionlst(raw_sheet, ip.get_dilutions().length, pos);
 						data = new double[size];
 						dilution = ip.get_dilutions(raw_sheet, size);
 					}
+					if(!run_id[1].equals(id_check)) { //accounts for different amount of dilutions in the same run
+						size = ip.size_dilutionlst(raw_sheet, ip.get_dilutions().length, pos);
+						data = new double[size];
+						dilution = ip.get_dilutions(raw_sheet, size);
+					}
+					id_check = run_id[1];
 					run_check = run_id[0];
 
 					// control and standards line
 					if (first_line) {
-						ctrl = ip.ctrl_standards(ctrl_sheet, hpv[master_counter], size, run_id, dilution);
-
-						log_ctrl = cp.log_results(ctrl);
+						
+						ctrl = ip.ctrl_standards(ctrl_sheet, hpv[master_counter], run_id, dilution);
+						
+						
+						log_ctrl = cp.log_resultsCTRL(ctrl);
 						ctrl_Ymean = cp.Ymean(log_ctrl);
 						ctrl_Xmean = cp.Xmean(log_ctrl);
 						SXX = cp.sxx(log_ctrl, ctrl_Xmean);
@@ -154,7 +152,7 @@ public class Main {
 						pll = cp.pll(rf, df, first_slope, ctrl_Xmean, ctrl_Ymean, ctrl_Xmean, ctrl_Ymean);
 						slope_ratio = (first_slope / first_slope);
 						correlation = cp.correlation(log_ctrl);
-						data_results = op.data_results(ip.get_id_dilution(), parameter_dilutions, ctrl, wPLL, rfl, pll,
+						data_results = op.data_resultsCTRL(ip.get_id_dilution(), parameter_dilutions, ctrl, wPLL, rfl, pll,
 								correlation, first_slope, slope_ratio);
 						String temp = run_id[1];
 						run_id[1] = ip.get_standard();
@@ -165,9 +163,10 @@ public class Main {
 						first_line = false;
 					}
 
-					data = ip.line_raw(raw_sheet, hpv[master_counter], pos, size);
-					// data = Inputs.line_raw(raw_sheet, "HPV 6", pos, size);
+					data = ip.line_raw(raw_sheet, hpv[master_counter], pos, size); // data = Inputs.line_raw(raw_sheet,
+																					// "HPV 6", pos, size);
 					boolean seropositive = ip.seropositivity(cut_off_value, data);
+
 					if (!seropositive) {
 						op.swrite_data(error_cellstyle, out_sheet, index, run_id, data);
 						index++;
@@ -211,7 +210,7 @@ public class Main {
 								ip.get_slope_cut_off(), ip.get_sloperatio_cut_off());
 						index++;
 					}
-					pos = (pos + size); // counter used for extracting the next line
+					pos += size; // counter used for extracting the next line
 				}
 				// inside for loop but outside while loop
 			}
@@ -219,7 +218,7 @@ public class Main {
 
 		}
 		// this is outside the raw data loop
-		//op.output_file(output, input);
+
 		op.output_file(output, input, output_name, output_path);
 		System.out.println("file created");
 	}

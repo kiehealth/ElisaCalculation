@@ -1,7 +1,5 @@
 package org.standard.wll;
 
-import java.util.ArrayList;
-
 /**
  * @author Victoria Torres
  *
@@ -11,19 +9,19 @@ public class Calculations extends Inputs {
 
 	// actualizes the factor num. Finds the starting position of the new fixed array
 	// of raw data. Uses said position to find which dilution it corresponds to
-	public void fix_data(double[] result, int[] parameter_dil, double id_dil) {
+	public void fix_data(double[] result, double[] dilutions, double id_dil) {
 		int i = 0;
 		while (result[i] == 0 && i < (result.length - 1)) {
 			i++;
 		}
 		if (result[i] != 0) {
-			factor = (id_dil / parameter_dil[i]);
+			factor = (id_dil / dilutions[i]);
 		}
 
 	}
 
 	// removes the sample values that would not result in a negative slope.
-	public double[] fix_negative_slope(double[] data, int[] parameter_dil, double diff_2_factor, double id_dil) {
+	public double[] fix_negative_slope(double[] data, double[] dilutions, double diff_2_factor, double id_dil) {
 		double p1 = 0;
 		double p2 = 0;
 		double diff = 0;
@@ -40,17 +38,15 @@ public class Calculations extends Inputs {
 			} else
 				result[i] = 0;
 		}
-		if (data.length - 2 >= 0) {
-			p1 = result[data.length - 2];
-			p2 = data[data.length - 1];
-			percent_cutoff = (p1 * diff_2_factor);
-			diff = (p1 - p2);
-			if (diff >= percent_cutoff) {
-				result[(data.length - 1)] = data[(data.length - 1)];
-			}
+		p1 = result[data.length - 2];
+		p2 = data[data.length - 1];
+		percent_cutoff = (p1 * diff_2_factor);
+		diff = (p1 - p2);
+		if (diff >= percent_cutoff) {
+			result[(data.length - 1)] = data[(data.length - 1)];
 		}
 
-		fix_data(result, parameter_dil, id_dil);
+		fix_data(result, dilutions, id_dil);
 		return result;
 	}
 
@@ -91,19 +87,6 @@ public class Calculations extends Inputs {
 		}
 		return log;
 	}
-	
-	public double[] log_resultsCTRL(ArrayList<Double> ctrl) {
-		double[] log = new double[ctrl.size()];
-
-		for (int i = 0; i < log.length; i++) {
-			if (ctrl.get(i) > 0) {
-				log[i] = Math.log(ctrl.get(i));
-			} else
-				log[i] = -1; // alerts the calculations
-		}
-		return log;
-	}
-	
 
 	public double Ymean(double[] array) {
 		int denominator = 0;

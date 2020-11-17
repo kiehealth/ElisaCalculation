@@ -29,7 +29,7 @@ public class Inputs {
 
 	// parameters extracted from the paramater sheet
 	String[] raw_data;
-	int[] parameter_dilutions;
+	double[] parameter_dilutions;
 	String standards;
 	String reference_factors;
 	String cut_off;
@@ -57,7 +57,7 @@ public class Inputs {
 		return raw_data;
 	}
 
-	public int[] get_dilutions() {
+	public double[] get_dilutions() {
 		return parameter_dilutions;
 	}
 
@@ -133,7 +133,7 @@ public class Inputs {
 		row = parameter_sheet.getRow(13);
 		cell = row.getCell(1);
 		array_size = (int) cell.getNumericCellValue();
-		parameter_dilutions = new int[array_size];
+		parameter_dilutions = new double[array_size];
 
 		for (int i = 0; i < array_size; i++) {
 			row = parameter_sheet.getRow(14);
@@ -296,8 +296,8 @@ public class Inputs {
 	// run and id of the sample needed to present the results
 	public String[] run_id(XSSFSheet raw_sheet, int pos) {
 		String[] runId = new String[2];
-		int RUN = 0;
-		int ID = 1;
+		int RUN = find_column(raw_sheet, "RUN") ;
+		int ID = find_column(raw_sheet, "ID") ;
 
 		Row row = raw_sheet.getRow(pos + 1);
 		Cell r_cell = row.getCell(RUN);
@@ -349,12 +349,13 @@ public class Inputs {
 	public double[] ctrl_standards(XSSFSheet ctrl_sheet, String type, int size, String[] run_id, double[] dilution) {
 		double[] ctrl = new double[size];
 		int type_col = find_column(ctrl_sheet, type);
-		// String run = "";
+		int RUN = find_column(ctrl_sheet, "RUN") ;
+		int ID = find_column(ctrl_sheet, "ID") ;
 
 		for (int rowindex = 1; rowindex <= ctrl_sheet.getLastRowNum(); rowindex++) {
 			Row row = ctrl_sheet.getRow(rowindex);
-			Cell run_cell = row.getCell(0);
-			Cell standard_cell = row.getCell(2);
+			Cell run_cell = row.getCell(RUN);
+			Cell standard_cell = row.getCell(ID);
 
 			if (String.valueOf(run_cell.getNumericCellValue()).equals(run_id[0])
 					&& (standard_cell.getStringCellValue().equals(stand))) {

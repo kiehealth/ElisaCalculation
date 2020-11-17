@@ -30,17 +30,17 @@ public class Main {
 		Calculations cp = new Calculations();
 
 		// help the user out to fill all the sections
-		if (args.length < 3) {
-			System.out.println(" \n Please re-run your program like this: \n "
-					+ "java program.jar /path/to/input name_of_output /path/to/output");
-			System.exit(-1);
-		}
-		String input_path = args[0];
-		String output_name = args[1];
-		String output_path = args[2];
+//		if (args.length < 3) {
+//			System.out.println(" \n Please re-run your program like this: \n "
+//					+ "java program.jar /path/to/input name_of_output /path/to/output");
+//			System.exit(-1);
+//		}
+//		String input_path = args[0];
+		String output_name = "result"; //args[1];
+		String output_path = "/Users/bitchtoria/Downloads/"; //args[2];
 	
 		
-		//String input_path = "/Users/bitchtoria/Downloads/test_serology_20201030.xlsx";
+		String input_path = "/Users/bitchtoria/Downloads/test_20200325.xlsx";
 
 		// loads the input excelfile
 		XSSFWorkbook input = (XSSFWorkbook) ip.load_excel(input_path);
@@ -84,7 +84,7 @@ public class Main {
 				double[] dilution = ip.get_dilutions(raw_sheet, size,1); // gets the dilution list
 				double[] ctrl; // will be done in the while loop
 
-				int[] parameter_dilutions = ip.get_dilutions();
+				double[] parameter_dilutions = ip.get_dilutions();
 
 				XSSFSheet out_sheet = op.create_sheet(output, raw_data[raw_counter], hpv[master_counter],
 						ip.get_standard(), parameter_dilutions);
@@ -121,7 +121,8 @@ public class Main {
 				int pos = 0;
 
 				System.out.println("processing");
-
+				
+				try {
 				while (pos < raw_sheet.getLastRowNum()) { // counter for each line
 					String[] run_id = ip.run_id(raw_sheet, pos);
 					if (!run_id[1].equals(run_check[1])) {
@@ -220,6 +221,9 @@ public class Main {
 						index++;
 					}
 					pos = (pos + size); // counter used for extracting the next line
+				}
+				}catch(NullPointerException e) {
+					System.out.println("If you were using a template MAKE SURE to delete the rows below your data.");
 				}
 				// inside for loop but outside while loop
 			}

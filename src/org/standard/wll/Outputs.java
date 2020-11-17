@@ -24,7 +24,7 @@ public class Outputs {
 	// Creates a new sheet named after the raw data page name, virus type, and
 	// standard. Creates the header.
 	public XSSFSheet create_sheet(XSSFWorkbook workbook, String month, String type, String standard,
-			int[] parameter_dilutions) throws IOException {
+			double[] parameter_dilutions) throws IOException {
 		String name = (month + "  " + type + "  " + standard);
 		XSSFSheet sheet = workbook.createSheet(name);
 
@@ -56,7 +56,7 @@ public class Outputs {
 	}
 
 	// Puts the data and results in the same array.
-	public double[] data_results(double dilution, int[] parameter_dilutions, double[] data, double wPLL, double rfl,
+	public double[] data_results(double dilution, double[] parameter_dilutions, double[] data, double wPLL, double rfl,
 			double pll, double correlation, double slope, double slope_ratio) {
 		int num_of_dilutions = data.length; // num of dilutions for this standard
 		double[] result = new double[header.length - 5]; // everything except the run, id, sero+, and errors(2)
@@ -64,9 +64,13 @@ public class Outputs {
 		int index = 0;
 		int i = 0;
 
+		try {
 		// fixes the data to be placed underneath the right column
 		while (dilution != parameter_dilutions[i]) {
 			i++;
+		}
+		} catch (NullPointerException e) {
+			System.out.println("You have a dilution not specified in the parameters");
 		}
 		for (start = i; start < (num_of_dilutions + i); start++) {
 			result[start] = data[index];
@@ -156,7 +160,7 @@ public class Outputs {
 
 	// Used for seropositive samples.
 	public void sswrite_data(CellStyle style, CellStyle warning_style, XSSFSheet sheet, int index, String[] run_id,
-			int[] parameter_dilutions, double[] data_results, double[] data_calculations, double correlation_cut_off,
+			double[] parameter_dilutions, double[] data_results, double[] data_calculations, double correlation_cut_off,
 			double slope_cut_off, double sloperatio_cut_off) {
 
 		Row row = sheet.createRow(index);

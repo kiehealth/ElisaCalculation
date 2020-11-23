@@ -7,7 +7,7 @@ package org.standard.wll;
 
 public class Calculations extends Inputs {
 
-	// actualizes the factor num. Finds the starting position of the new fixed array
+	// updates the factor num. Finds the starting position of the new fixed array
 	// of raw data. Uses said position to find which dilution it corresponds to
 	public void fix_data(double[] result, double[] dilutions, double id_dil) {
 		int i = 0;
@@ -35,8 +35,9 @@ public class Calculations extends Inputs {
 			diff = (p1 - p2);
 			if (diff >= percent_cutoff) {
 				result[i] = data[i]; // CHECK IF THERE IS AT LEAST 2 NUMBERS IN IT
-			} else
+			} else {
 				result[i] = 0;
+			}
 		}
 		p1 = result[data.length - 2];
 		p2 = data[data.length - 1];
@@ -44,8 +45,10 @@ public class Calculations extends Inputs {
 		diff = (p1 - p2);
 		if (diff >= percent_cutoff) {
 			result[(data.length - 1)] = data[(data.length - 1)];
+		}else {
+			result[(data.length - 1)] = 0;
 		}
-
+		
 		fix_data(result, dilutions, id_dil);
 		return result;
 	}

@@ -30,11 +30,11 @@ public class Main {
 		Calculations cp = new Calculations();
 
 		// help the user out to fill all the sections
-		if (args.length < 3) {
-			System.out.println(" \n Please re-run your program like this: \n "
-					+ "java program.jar /path/to/input name_of_output /path/to/output");
-			System.exit(-1);
-		}
+//		if (args.length < 3) {
+//			System.out.println(" \n Please re-run your program like this: \n "
+//					+ "java program.jar /path/to/input name_of_output /path/to/output");
+//			System.exit(-1);
+//		}
 		String input_path = args[0];
 		String output_name = args[1];
 		String output_path = args[2];

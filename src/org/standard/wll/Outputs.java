@@ -176,18 +176,20 @@ public class Outputs {
 
 		int raw_size = (parameter_dilutions.length + 2);
 		int size = data_results.length;
-
-		// prints the raw data
-		for (int i = 2; i < raw_size; i++) {
-			cell = row.createCell(i);
-			if (data_results[i - 2] == 0) {
+		int offset = 0;
+		
+		// prints the raw data, the plus two is because the first two rows are occupied for run and id
+		for (int i = 0; i < raw_size; i++) {
+			cell = row.createCell(i+2);
+			if (data_results[i] == 0) {
+				offset++;
 				// this sets cells to blank
-			} else if (i-2 < data_calculations.length && data_results[i - 2] != data_calculations[i - 2]) {
-				cell.setCellValue(data_results[i - 2]);
+			} else if (i-offset < data_calculations.length && i < data_results.length && data_results[i] != data_calculations[i - offset]) {
+				cell.setCellValue(data_results[i]);
 				cell.setCellStyle(warning_style);
 				error_check++;
 			} else {
-				cell.setCellValue(data_results[i - 2]);
+				cell.setCellValue(data_results[i]);
 				cell.setCellStyle(style);
 			}
 		}

@@ -149,10 +149,10 @@ public class Outputs {
 		// errors, if any of the error is true then you have an error type 1
 		if (error) {
 			cell = row.createCell(header.length - 2);
-			cell.setCellValue(1);
+			cell.setCellValue(5);
 			cell.setCellStyle(warning_style);
 			cell = row.createCell(header.length - 1);
-			cell.setCellValue("Poor Standard");
+			cell.setCellValue("Poor Standard. Please provide valid reference values");
 			error = false;
 		}
 
@@ -165,7 +165,7 @@ public class Outputs {
 
 		Row row = sheet.createRow(index);
 		Cell cell;
-		boolean error = false;
+		boolean error3 = false;
 		int error_check = 0;
 
 		for (int i = 0; i < run_id.length; i++) {
@@ -177,6 +177,7 @@ public class Outputs {
 		int raw_size = (parameter_dilutions.length + 2);
 		int size = data_results.length;
 		int offset = 0;
+		boolean error2 = false;
 		
 		// prints the raw data, the plus two is because the first two rows are occupied for run and id
 		for (int i = 0; i < raw_size; i++) {
@@ -184,10 +185,13 @@ public class Outputs {
 			if (data_results[i] == 0) {
 				offset++;
 				// this sets cells to blank
-			} else if (i-offset < data_calculations.length && i < data_results.length && data_results[i] != data_calculations[i - offset]) {
+			}else if (i-offset>= 0 && i < size && i-offset < data_calculations.length && data_results[i] != data_calculations[i - offset]) {
 				cell.setCellValue(data_results[i]);
 				cell.setCellStyle(warning_style);
 				error_check++;
+				if(((i - offset)-1)>=0 && ((i - offset)+1)<data_calculations.length && data_calculations[(i - offset)+1] != 0 && data_calculations[(i - offset)-1] != 0) {
+					error2 = true; 
+				}
 			} else {
 				cell.setCellValue(data_results[i]);
 				cell.setCellStyle(style);
@@ -209,7 +213,7 @@ public class Outputs {
 		if (data_results[size - 3] < correlation_cut_off) {
 			cell.setCellValue(data_results[size - 3]);
 			cell.setCellStyle(warning_style);
-			error = true;
+			error3 = true;
 		} else {
 			cell.setCellValue(data_results[size - 3]);
 			cell.setCellStyle(style);
@@ -219,7 +223,7 @@ public class Outputs {
 		if (data_results[size - 2] > slope_cut_off) {
 			cell.setCellValue(data_results[size - 2]);
 			cell.setCellStyle(warning_style);
-			error = true;
+			error3 = true;
 		} else {
 			cell.setCellValue(data_results[size - 2]);
 			cell.setCellStyle(style);
@@ -229,7 +233,7 @@ public class Outputs {
 		if (data_results[size - 1] < sloperatio_cut_off) { // you can do this a method take abs
 			cell.setCellValue(data_results[size - 1]);
 			cell.setCellStyle(warning_style);
-			error = true;
+			error3 = true;
 		} else {
 			cell.setCellValue(data_results[size - 1]);
 			cell.setCellStyle(style);
@@ -243,27 +247,34 @@ public class Outputs {
 		// errors
 		if (data_calculations.length == error_check || ((data_calculations.length - error_check) == 1)) {
 			cell = row.createCell(raw_size + 7);
-			cell.setCellValue(2);
+			cell.setCellValue(1);
 			cell.setCellStyle(warning_style);
 			cell = row.createCell(raw_size + 8);
-			cell.setCellValue("Must be re-tested");
+			cell.setCellValue("Sample must be re-tested");
 			for (int colindex = raw_size; colindex < (raw_size + 6); colindex++) {
 				row.removeCell(row.getCell(colindex));
 			}
 
-		} else if (error) {
+		}else if(error2) {
+			cell = row.createCell(raw_size + 7);
+			cell.setCellValue(2);
+			cell.setCellStyle(warning_style);
+			cell = row.createCell(raw_size + 8);
+			cell.setCellValue("Fluctuating values. IU conversion may be erroneous. Sample re-testing is recommended");
+			error2 = false;
+		} else if (error3) {
 			cell = row.createCell(raw_size + 7);
 			cell.setCellValue(3);
 			cell.setCellStyle(warning_style);
 			cell = row.createCell(raw_size + 8);
-			cell.setCellValue("Could be re-tested");
-			error = false;
+			cell.setCellValue("Sample could be re-tested (correlation/slope/slope ratio is out of the recommended range)");
+			error3 = false;
 		} else if ((data_calculations.length - error_check) == 2) {
 			cell = row.createCell(raw_size + 7);
 			cell.setCellValue(4);
 			cell.setCellStyle(warning_style);
 			cell = row.createCell(raw_size + 8);
-			cell.setCellValue("Two dilutions used");
+			cell.setCellValue("Only two dilutions used for unit conversion");
 		}
 
 	}
